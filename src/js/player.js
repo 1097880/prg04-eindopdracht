@@ -5,11 +5,14 @@ import { FloorSlide } from "./particles/floorslide";
 
 export class Player extends Actor {
 
-    isGrounded = false;
+    #speed = 535;
+    #jumpStrength = 1150;
+    
+    #isGrounded = false;
 
     constructor() {
         super({
-            pos: new Vector(120, 600),
+            pos: new Vector(250, 500),
             scale: new Vector(2, 2),
             radius: Resources.Player.width / 2,
             collisionType: CollisionType.Active
@@ -20,7 +23,6 @@ export class Player extends Actor {
         this.graphics.use(Resources.Player.toSprite());
         this.body.mass = 1;
 
-        // this.body.vel = new Vector(300, 0);
         this.floorslide = new FloorSlide();
         this.addChild(this.floorslide);
 
@@ -28,12 +30,17 @@ export class Player extends Actor {
     }
 
     onPreUpdate(engine) {
-        if (engine.input.keyboard.isHeld(Keys.Space) && this.isGrounded) {
-            this.body.vel = new Vector(this.body.vel.x, -700);
-            this.isGrounded = false;
+        this.scene?.camera.strategy.radiusAroundActor(this, 450);
+        this.scene?.camera.move(new Vector(this.pos.x + 390, this.scene?.camera.pos.y), 0);
+
+        this.body.vel = new Vector(this.#speed, this.body.vel.y);
+
+        if (engine.input.keyboard.isHeld(Keys.Space) && this.#isGrounded) {
+            this.body.vel = new Vector(this.body.vel.x, -this.#jumpStrength);
+            this.#isGrounded = false;
         }
         
-        this.floorslide.isEmitting = this.isGrounded;
+        this.floorslide.isEmitting = this.#isGrounded;
     }
 
     collisionHandler(e) {
@@ -42,7 +49,7 @@ export class Player extends Actor {
             const blockTop = e.other.owner.pos.y - e.other.owner.height / 2
 
             if (Math.abs(playerBottom - blockTop) < 10) {
-                this.isGrounded = true;
+                this.#isGrounded = true;
                 this.body.vel = new Vector(this.body.vel.x, 0);
             }
 

@@ -4,10 +4,10 @@ export class FloorSlide extends ParticleEmitter {
     constructor() {
         super({
             emitterType: EmitterType.Rectangle,
-            emitRate: 20,
+            emitRate: 50,
             isEmitting: false,
             particle: {
-                life: 1000,
+                life: 750,
                 fade: true,
                 beginColor: Color.White,
                 endColor: Color.LightGray,
@@ -16,7 +16,7 @@ export class FloorSlide extends ParticleEmitter {
                 minSpeed: 75,
                 maxSpeed: 85,
                 minAngle: Math.PI,
-                maxAngle: Math.PI + 0.8
+                maxAngle: Math.PI + 2
             }
         });
         this.pos = new Vector(0, 16);
