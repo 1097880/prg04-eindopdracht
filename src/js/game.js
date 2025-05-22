@@ -2,6 +2,7 @@ import '../css/style.css';
 import { Actor, DisplayMode, Engine, SolverStrategy, Vector } from "excalibur";
 import { Resources, ResourceLoader } from './resources.js';
 import { Player } from './player.js';
+import { Block } from './block.js';
 
 export class Game extends Engine {
 
@@ -12,8 +13,8 @@ export class Game extends Engine {
             maxFps: 60,
             displayMode: DisplayMode.FitScreen,
             physics: {
-                gravity: new Vector(0, 800),
-                solver: SolverStrategy.Realistic
+                gravity: new Vector(0, 1600),
+                solver: SolverStrategy.Arcade
             }
          });
         this.start(ResourceLoader).then(() => this.startGame());
@@ -24,6 +25,9 @@ export class Game extends Engine {
         
         const player = new Player();
         this.add(player);
+
+        const block = new Block(0, 656, 20, 1);
+        this.add(block);
     }
 }
 

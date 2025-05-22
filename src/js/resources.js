@@ -1,7 +1,8 @@
-import { ImageSource, Sound, Resource, Loader } from 'excalibur';
+import { ImageSource, Sound, Resource, Loader, ImageWrapping } from 'excalibur';
 
 const Resources = {
-    Player: new ImageSource('images/player.png')
+    Player: new ImageSource('images/player.png'),
+    Block: new ImageSource('images/block.png', { wrapping: ImageWrapping.Repeat })
 }
 
 const ResourceLoader = new Loader()
