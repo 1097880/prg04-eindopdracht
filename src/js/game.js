@@ -3,6 +3,7 @@ import { Actor, BoundingBox, DisplayMode, Engine, SolverStrategy, Vector } from 
 import { Resources, ResourceLoader } from './resources.js';
 import { Player } from './player.js';
 import { Block } from './block.js';
+import { UI } from './ui.js';
 
 export class Game extends Engine {
 
@@ -36,6 +37,9 @@ export class Game extends Engine {
         this.add(block4);
         const block5 = new Block(1472+256, 592, 1, 5);
         this.add(block5);
+
+        this.ui = new UI();
+        this.add(this.ui);
     }
 }
 
