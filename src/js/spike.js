@@ -1,4 +1,4 @@
-import { Actor, CollisionType, Color, Polygon, Sprite, Vector } from "excalibur";
+import { Actor, CollisionType, Sprite, Vector } from "excalibur";
 import { Resources } from "./resources";
 
 export class Spike extends Actor {

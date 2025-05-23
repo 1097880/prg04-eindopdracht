@@ -2,12 +2,13 @@ import { Actor, CollisionType, Keys, Vector } from "excalibur";
 import { Resources } from "./resources";
 import { Block } from "./block";
 import { FloorSlide } from "./particles/floorslide";
+import { JumpPad } from "./jumppad";
 
 export class Player extends Actor {
 
     #speed = 535;
     #jumpStrength = 1150;
-    
+
     #isGrounded = false;
     #isAlive = false;
     #isResetting = false;
@@ -25,6 +26,7 @@ export class Player extends Actor {
     onInitialize(engine) {
         this.graphics.use(Resources.Player.toSprite());
         this.body.mass = 1;
+        this.scene?.camera.strategy.radiusAroundActor(this, 450);
         this.updateCameraPos();
 
         this.floorslide = new FloorSlide();
@@ -35,11 +37,11 @@ export class Player extends Actor {
     }
 
     onPreUpdate(engine) {
-        if(this.body.vel.x > 0) {
+        if (this.body.vel.x > 0) {
             this.updateCameraPos();
         }
 
-        if(this.#isAlive && this.body.vel.x < this.#speed) {
+        if (this.#isAlive && (this.body.vel.x < this.#speed || this.body.vel.x > this.#speed)) {
             this.body.vel = new Vector(this.#speed, this.body.vel.y);
         }
 
@@ -59,7 +61,6 @@ export class Player extends Actor {
     }
 
     updateCameraPos() {
-        this.scene?.camera.strategy.radiusAroundActor(this, 450);
         this.scene?.camera.move(new Vector(this.pos.x + 390, this.scene?.camera.pos.y), 0);
     }
 
@@ -76,11 +77,11 @@ export class Player extends Actor {
     restartLevel() {
         this.#isAlive = false;
         this.#isResetting = true;
-        
+
         this.body.useGravity = false;
         this.vel = Vector.Zero;
-        
-        this.graphics.isVisible = false;
+
+        this.graphics.opacity = 0;
 
         Resources.GameMusic.stop();
         Resources.DeathSfx.play();
@@ -93,7 +94,7 @@ export class Player extends Actor {
 
             this.body.useGravity = true;
 
-            this.graphics.isVisible = true;
+            this.graphics.opacity = 1;
 
             Resources.GameMusic.play();
         }, 1500);
@@ -108,8 +109,12 @@ export class Player extends Actor {
                 this.#isGrounded = true;
                 this.body.vel = new Vector(this.body.vel.x, 0);
             } else {
-                this.restartLevel();
+                if (!this.#isResetting) this.restartLevel();
             }
+        }
+
+        if(e.other.owner instanceof JumpPad) {
+            this.body.vel.y = -1600;
         }
     }
 

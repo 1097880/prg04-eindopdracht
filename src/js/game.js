@@ -5,6 +5,7 @@ import { Player } from './player.js';
 import { Block } from './block.js';
 import { UI } from './ui.js';
 import { Spike } from './spike.js';
+import { JumpPad } from './jumppad.js';
 
 export class Game extends Engine {
 
@@ -29,11 +30,16 @@ export class Game extends Engine {
         this.add(player);
 
         const levelLayout = [
-            [Block, 0, 720, 40, 2],
+            [Block, 0, 720, 400, 2],
             [Block, 64 * 18, 592, 1, 2],
-            [Block, 64 * 27, 592, 1, 2],
-            [Spike, 64 * 37, 592, 1, false],
-            [Block, 64 * 38, 592, 1, 2]
+            [Block, 64 * 28, 592, 1, 2],
+            [Spike, 64 * 37, 592, 3, false],
+            [Block, 64 * 38, 592, 1, 2],
+            [Spike, 64 * 42, 592, 1, false],
+            [Spike, 64 * 46, 592, 3, false],
+            [Block, 64 * 57, 592, 4, 1],
+            [Block, 64 * 61, 400, 1, 2],
+            [JumpPad, 64 * 62, 592]
         ]
 
         for (const [object, x, y, par1, par2] of levelLayout) {
