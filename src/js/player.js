@@ -9,7 +9,10 @@ export class Player extends Actor {
     #jumpStrength = 1150;
     
     #isGrounded = false;
-    #gameStarted = false;
+    #isAlive = false;
+    #isResetting = false;
+
+    #lives = 3;
 
     constructor() {
         super({
@@ -36,18 +39,18 @@ export class Player extends Actor {
             this.updateCameraPos();
         }
 
-        if(this.#gameStarted) this.body.vel = new Vector(this.#speed, this.body.vel.y);
+        if(this.#isAlive && this.body.vel.x < this.#speed) {
+            this.body.vel = new Vector(this.#speed, this.body.vel.y);
+        }
 
-        if (engine.input.keyboard.isHeld(Keys.Space) && this.#isGrounded) {
+        if (engine.input.keyboard.isHeld(Keys.Space) && this.#isGrounded && this.#isAlive && !this.#isResetting) {
             this.jump();
         }
-        if (engine.input.keyboard.wasPressed(Keys.Space) && !this.#gameStarted) {
+        if (engine.input.keyboard.wasPressed(Keys.Space) && !this.#isAlive && !this.#isResetting) {
             this.startGame();
         }
 
-        
-        // @ts-ignore
-        this.floorslide.isEmitting = this.#isGrounded;
+        this.floorslide.isEmitting = this.#isGrounded && this.#isAlive;
     }
 
     jump() {
@@ -61,11 +64,39 @@ export class Player extends Actor {
     }
 
     startGame() {
-        this.#gameStarted = true;
+        this.#isAlive = true;
         this.body.collisionType = CollisionType.Active;
 
-        // @ts-ignore
         this.scene?.engine.ui.startGame();
+
+        Resources.MenuMusic.stop();
+        Resources.GameMusic.play();
+    }
+
+    restartLevel() {
+        this.#isAlive = false;
+        this.#isResetting = true;
+        
+        this.body.useGravity = false;
+        this.vel = Vector.Zero;
+        
+        this.graphics.isVisible = false;
+
+        Resources.GameMusic.stop();
+        Resources.DeathSfx.play();
+
+        setTimeout(() => {
+            this.pos = new Vector(250, 360);
+
+            this.#isAlive = true;
+            this.#isResetting = false;
+
+            this.body.useGravity = true;
+
+            this.graphics.isVisible = true;
+
+            Resources.GameMusic.play();
+        }, 1500);
     }
 
     collisionHandler(e) {
@@ -76,6 +107,8 @@ export class Player extends Actor {
             if (Math.abs(playerBottom - blockTop) < 10) {
                 this.#isGrounded = true;
                 this.body.vel = new Vector(this.body.vel.x, 0);
+            } else {
+                this.restartLevel();
             }
         }
     }
