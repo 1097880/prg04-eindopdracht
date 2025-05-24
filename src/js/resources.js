@@ -11,6 +11,7 @@ const Resources = {
     Block: new ImageSource('images/block.png', { wrapping: ImageWrapping.Repeat }),
     Spike: new ImageSource('images/spike.png', { wrapping: ImageWrapping.Repeat }),
     JumpPad: new ImageSource('images/jumppad.png'),
+    GravityPad: new ImageSource('images/gravitypad.png'),
 
     Logo: new ImageSource('images/logo.png')
 }

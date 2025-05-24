@@ -1,10 +1,10 @@
 import { Color, EmitterType, ParticleEmitter, Vector } from "excalibur";
 
-export class JumpPadGlow extends ParticleEmitter {
+export class PadGlow extends ParticleEmitter {
     
     #originalX;
     
-    constructor() {
+    constructor(color) {
         super({
             emitterType: EmitterType.Rectangle,
             emitRate: 50,
@@ -12,7 +12,7 @@ export class JumpPadGlow extends ParticleEmitter {
             particle: {
                 life: 500,
                 fade: true,
-                beginColor: Color.Green,
+                beginColor: color,
                 endColor: Color.LightGray,
                 minSize: 2,
                 maxSize: 5,

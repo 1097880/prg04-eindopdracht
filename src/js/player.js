@@ -1,9 +1,10 @@
-import { Actor, CollisionType, Keys, Vector } from "excalibur";
+import { Actor, CollisionType, Color, Keys, Vector } from "excalibur";
 import { Resources } from "./resources";
 import { Block } from "./block";
 import { FloorSlide } from "./particles/floorslide";
 import { JumpPad } from "./jumppad";
-import { JumpPadTrail } from "./particles/jumppadtrail";
+import { PadTrail } from "./particles/padtrail";
+import { GravityPad } from "./gravitypad";
 
 export class Player extends Actor {
 
@@ -13,6 +14,7 @@ export class Player extends Actor {
     #isGrounded = false;
     #isAlive = false;
     #isResetting = false;
+    #isFlipping = false;
 
     #lives = 3;
 
@@ -32,7 +34,7 @@ export class Player extends Actor {
 
         this.floorslide = new FloorSlide();
         this.addChild(this.floorslide);
-        this.jumppadtrail = new JumpPadTrail();
+        this.jumppadtrail = new PadTrail(Color.Green);
         this.addChild(this.jumppadtrail);
 
         this.on('collisionstart', (e) => this.collisionHandler(e));
@@ -59,7 +61,8 @@ export class Player extends Actor {
     }
 
     jump() {
-        this.body.vel = new Vector(this.body.vel.x, -this.#jumpStrength);
+        const flip = (this.scene.engine.physics.gravity.y > 0) ? 1 : -1;
+        this.body.vel = new Vector(this.body.vel.x, -this.#jumpStrength * flip);
         this.#isGrounded = false;
     }
 
@@ -80,9 +83,11 @@ export class Player extends Actor {
     restartLevel() {
         this.#isAlive = false;
         this.#isResetting = true;
+        this.#isFlipping = false;
 
         this.body.useGravity = false;
         this.vel = Vector.Zero;
+        this.scene.engine.physics.gravity = new Vector(this.scene.engine.physics.gravity.x, 4000);
 
         this.graphics.opacity = 0;
 
@@ -104,20 +109,37 @@ export class Player extends Actor {
     }
 
     collisionHandler(e) {
+        if (e.other.owner instanceof GravityPad) {
+            const gravity = this.scene.engine.physics.gravity;
+            this.scene.engine.physics.gravity = new Vector(gravity.x, gravity.y * -1);
+
+            this.#isFlipping = true;
+        }
+
         if (e.other.owner instanceof Block) {
             this.jumppadtrail.isEmitting = false;
-            const playerBottom = this.pos.y + this.height / 2
-            const blockTop = e.other.owner.pos.y - e.other.owner.height / 2
+            const playerBottom = this.pos.y + this.height / 2;
+            const blockTop = e.other.owner.pos.y - e.other.owner.height / 2;
 
-            if (Math.abs(playerBottom - blockTop) < 10) {
+            const playerTop = this.pos.y - this.height / 2;
+            const blockBottom = e.other.owner.pos.y + e.other.owner.height / 2;
+
+            if (Math.abs(playerBottom - blockTop) < 10 && this.scene.engine.physics.gravity.y > 0) {
                 this.#isGrounded = true;
+                this.#isFlipping = false;
                 this.body.vel = new Vector(this.body.vel.x, 0);
+                this.floorslide.pos.y = 16;
+            } else if (Math.abs(blockBottom - playerTop) < 10 && this.scene.engine.physics.gravity.y < 0) {
+                this.#isGrounded = true;
+                this.#isFlipping = false;
+                this.body.vel = new Vector(this.body.vel.x, 0);
+                this.floorslide.pos.y = -16;
             } else {
-                if (!this.#isResetting) this.restartLevel();
+                if (!this.#isResetting && !this.#isFlipping) this.restartLevel();
             }
         }
 
-        if(e.other.owner instanceof JumpPad) {
+        if (e.other.owner instanceof JumpPad) {
             this.body.vel.y = -1600;
             this.jumppadtrail.isEmitting = true;
         }

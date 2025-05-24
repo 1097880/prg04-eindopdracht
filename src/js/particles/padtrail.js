@@ -1,8 +1,8 @@
 import { Color, EmitterType, ParticleEmitter, Rectangle, Vector } from "excalibur";
 
-export class JumpPadTrail extends ParticleEmitter {
+export class PadTrail extends ParticleEmitter {
 
-    constructor() {
+    constructor(color) {
         super({
             emitterType: EmitterType.Rectangle,
             emitRate: 120,
@@ -13,7 +13,7 @@ export class JumpPadTrail extends ParticleEmitter {
                 graphic: new Rectangle({
                     width: 25,
                     height: 25,
-                    color: Color.Green,
+                    color: color,
                 }),
                 randomRotation: true
             }
