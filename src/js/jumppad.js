@@ -1,5 +1,6 @@
 import { Actor, CollisionType, Vector } from "excalibur";
 import { Resources } from "./resources";
+import { JumpPadGlow } from "./particles/jumppadglow";
 
 export class JumpPad extends Actor {
     /**
@@ -21,6 +22,9 @@ export class JumpPad extends Actor {
 
     onInitialize(engine) {
         this.graphics.use(Resources.JumpPad.toSprite());
+
+        this.jumppadglow = new JumpPadGlow();
+        this.addChild(this.jumppadglow);
     }
 
 }

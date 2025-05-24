@@ -3,6 +3,7 @@ import { Resources } from "./resources";
 import { Block } from "./block";
 import { FloorSlide } from "./particles/floorslide";
 import { JumpPad } from "./jumppad";
+import { JumpPadTrail } from "./particles/jumppadtrail";
 
 export class Player extends Actor {
 
@@ -26,11 +27,13 @@ export class Player extends Actor {
     onInitialize(engine) {
         this.graphics.use(Resources.Player.toSprite());
         this.body.mass = 1;
-        this.scene?.camera.strategy.radiusAroundActor(this, 450);
+        this.scene?.camera.strategy.radiusAroundActor(this, 430);
         this.updateCameraPos();
 
         this.floorslide = new FloorSlide();
         this.addChild(this.floorslide);
+        this.jumppadtrail = new JumpPadTrail();
+        this.addChild(this.jumppadtrail);
 
         this.on('collisionstart', (e) => this.collisionHandler(e));
         this.on('collisionend', (e) => { this.#isGrounded = false })
@@ -102,6 +105,7 @@ export class Player extends Actor {
 
     collisionHandler(e) {
         if (e.other.owner instanceof Block) {
+            this.jumppadtrail.isEmitting = false;
             const playerBottom = this.pos.y + this.height / 2
             const blockTop = e.other.owner.pos.y - e.other.owner.height / 2
 
@@ -115,6 +119,7 @@ export class Player extends Actor {
 
         if(e.other.owner instanceof JumpPad) {
             this.body.vel.y = -1600;
+            this.jumppadtrail.isEmitting = true;
         }
     }
 
