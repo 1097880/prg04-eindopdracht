@@ -27,7 +27,7 @@ If you wish the run the game locally, you can follow these steps:
 1. Clone the project
 
 ```bash
-  git clone https://github.com/1097880/prg04-eindopdracht
+  git clone https://github.com/1097880/prg04-eindopdracht.git
 ```
 
 2. Go to the project directory
