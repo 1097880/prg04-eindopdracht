@@ -6,6 +6,7 @@ import { JumpPad } from "./jumppad";
 import { PadTrail } from "./particles/padtrail";
 import { GravityPad } from "./gravitypad";
 import { Spike } from "./spike";
+import { Obstacle } from "./obstacle";
 
 export class Player extends Actor {
 
@@ -37,6 +38,8 @@ export class Player extends Actor {
         this.addChild(this.floorslide);
         this.jumppadtrail = new PadTrail(Color.Green);
         this.addChild(this.jumppadtrail);
+        this.gravitypadtrail = new PadTrail(Color.Purple);
+        this.addChild(this.gravitypadtrail);
 
         this.on('collisionstart', (e) => this.collisionHandler(e));
         this.on('collisionend', (e) => {
@@ -119,6 +122,7 @@ export class Player extends Actor {
         if (e.other.owner instanceof GravityPad) {
             const gravity = this.scene.engine.physics.gravity;
             this.scene.engine.physics.gravity = new Vector(gravity.x, gravity.y * -1);
+            this.gravitypadtrail.isEmitting = true;
 
             this.#isFlipping = true;
         }
@@ -134,11 +138,13 @@ export class Player extends Actor {
             if (Math.abs(playerBottom - blockTop) < 10 && this.scene.engine.physics.gravity.y > 0) {
                 this.#isGrounded = true;
                 this.#isFlipping = false;
+                this.gravitypadtrail.isEmitting = false;
                 this.body.vel = new Vector(this.body.vel.x, 0);
                 this.floorslide.pos.y = 16;
             } else if (Math.abs(blockBottom - playerTop) < 10 && this.scene.engine.physics.gravity.y < 0) {
                 this.#isGrounded = true;
                 this.#isFlipping = false;
+                this.gravitypadtrail.isEmitting = false;
                 this.body.vel = new Vector(this.body.vel.x, 0);
                 this.floorslide.pos.y = -16;
             } else {
@@ -151,7 +157,7 @@ export class Player extends Actor {
             this.jumppadtrail.isEmitting = true;
         }
 
-        if (e.other.owner instanceof Spike) {
+        if (e.other.owner instanceof Obstacle) {
             this.#isGrounded = true;
             this.lives--;
             this.scene.engine.ui.updateLives(this.lives);

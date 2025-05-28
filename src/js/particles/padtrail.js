@@ -11,8 +11,8 @@ export class PadTrail extends ParticleEmitter {
                 life: 350,
                 fade: true,
                 graphic: new Rectangle({
-                    width: 25,
-                    height: 25,
+                    width: 20,
+                    height: 20,
                     color: color,
                 }),
                 randomRotation: true

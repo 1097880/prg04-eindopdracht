@@ -7,6 +7,7 @@ import { UI } from './ui.js';
 import { Spike } from './spike.js';
 import { JumpPad } from './jumppad.js';
 import { GravityPad } from './gravitypad.js';
+import { SawBlade } from './sawblade.js';
 
 export class Game extends Engine {
 
@@ -27,8 +28,8 @@ export class Game extends Engine {
     startGame() {
         console.log("Starting game...");
 
-        const player = new Player();
-        this.add(player);
+        this.player = new Player();
+        this.add(this.player);
 
         const LevelLayout = [
             [Block, 0, 720, 85, 2],
@@ -62,6 +63,9 @@ export class Game extends Engine {
             [Block, 64 * 151, 272, 20, 2],
             [Block, 64 * 162, 400, 1, 2],
             [GravityPad, 64 * 164, 272, true],
+            [GravityPad, 64 * 171, 592, false],
+            [SawBlade, 64 * 170, 400, new Vector(-64 * 2, 0), 100],
+            [Block, 64* 173, 272, 20, 2]
         ]
 
         for (const [object, x, y, par1, par2] of LevelLayout) {
@@ -69,7 +73,7 @@ export class Game extends Engine {
             this.add(element);
         }
 
-        this.ui = new UI(player);
+        this.ui = new UI(this.player);
         this.add(this.ui);
 
         Resources.MenuMusic.loop = true;

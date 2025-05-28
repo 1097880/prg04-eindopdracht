@@ -1,7 +1,8 @@
-import { Actor, CollisionType, Sprite, Vector } from "excalibur";
+import { CollisionType, Sprite, Vector } from "excalibur";
 import { Resources } from "./resources";
+import { Obstacle } from "./obstacle";
 
-export class Spike extends Actor {
+export class Spike extends Obstacle {
     /**
     * Creates a new group of spikes at the specified coördinates with the specified width and height.
     * @param {number} x - X position of the spike, starting from the left.
