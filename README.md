@@ -1,25 +1,49 @@
-# Excalibur Startproject 2025
+![Logo](https://github.com/1097880/prg04-eindopdracht/blob/main/public/images/logo.png?raw=true)
 
-- Vanaf de HR repository: klik op ***USE THIS TEMPLATE***. Kies jouw eigen github account. 
-- Kopieer de `git url` van jouw eigen repository (dit vind je onder de "code" button).
-- Open VS Code. Klik op "file" en kies "clone repository".
-- Npm start Vite met een eigen webserver, dus sla het project NIET op in je XAMPP of HERD folder waar al een webserver draait.
-- Typ `npm install` en `npm run dev` in de terminal in VS Code.
-- Installeer de [Chrome Excalibur Debugger](https://chromewebstore.google.com/detail/excalibur-dev-tools/dinddaeielhddflijbbcmpefamfffekc)
-- [Bekijk het instructie filmpje!](https://youtu.be/UIVpe4L5_P4)
 
-### Kies een resolutie
 
-***widescreen 16/9***
-- 640 × 360
-- 800 x 450
-- 1280 x 720
+# Rolling Ball - Platform Game
 
-***retro 4/3***
-- 512 × 384
-- 640 × 480
-- 800 × 600
+Rolling Ball is a Platformer Game mixed with elements of an Endless Runner! It was created for the final assignment of Programming 4 at Rotterdam University of Applied Sciences. 
 
-### Bewerk deze readme file
 
-Verwijder deze instructies, plaats hier een beschrijving van jouw game.
+
+## 🤖 Tech Stack
+
+- HTML & CSS
+- ExcaliburJS (*0.30.3*)
+- Vite (*6.2.1*)
+
+
+## 🎮 Play the Game
+
+You can play the game by going to the GitHub Pages link. (!PASTE LINK OVER 'GitHub Pages Link' TEXT!)
+
+
+## 🌐 Run Locally
+
+If you wish the run the game locally, you can follow these steps:
+
+1. Clone the project
+
+```bash
+  git clone https://github.com/1097880/prg04-eindopdracht
+```
+
+2. Go to the project directory
+
+```bash
+  cd my-project
+```
+
+3. Install dependencies
+
+```bash
+  npm install
+```
+
+4. Start the live server
+
+```bash
+  npm run dev
+```
