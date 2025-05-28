@@ -1,16 +1,22 @@
-import { Actor, Color, Label, ScreenElement, TextAlign, Vector } from "excalibur";
+import { Actor, Color, Label, ScreenElement, Sprite, TextAlign, Vector } from "excalibur";
 import { Resources } from "./resources";
 
 export class UI extends ScreenElement {
 
+    #player;
     #logo;
+    #hearts;
 
     #startMessage;
     #zoomTime = 0;
     #fading = false;
 
-    constructor() {
+    #lives;
+
+    constructor(player) {
         super();
+        this.#player = player;
+        this.#lives = player.lives;
     }
 
     onInitialize(engine) {
@@ -20,7 +26,7 @@ export class UI extends ScreenElement {
         });
         this.#logo.graphics.use(Resources.Logo.toSprite());
         this.addChild(this.#logo);
-        
+
         this.#startMessage = new Label({
             text: 'Press Space to start!',
             pos: new Vector(640, 350),
@@ -31,10 +37,27 @@ export class UI extends ScreenElement {
             })
         });
         this.addChild(this.#startMessage);
+
+        this.#hearts = new Actor({
+            x: 50,
+            y: -75,
+            anchor: Vector.Zero
+        })
+        this.#hearts.heartImage = new Sprite({
+            image: Resources.Heart,
+            sourceView: {
+                x: 0,
+                y: 0,
+                width: 64 * this.#lives,
+                height: 64
+            }
+        });
+        this.#hearts.graphics.use(this.#hearts.heartImage);
+        this.addChild(this.#hearts);
     }
 
     onPreUpdate(engine, delta) {
-        if(this.#startMessage) {
+        if (this.#startMessage) {
             this.#zoomTime += delta / 1000
             const scale = 1 + 0.02 * Math.sin(this.#zoomTime * 5)
             this.#startMessage.scale = new Vector(scale, scale);
@@ -54,6 +77,14 @@ export class UI extends ScreenElement {
         this.#fading = true;
 
         this.#logo.actions.moveTo(new Vector(640, -100), 500);
+
+        this.#hearts.actions.moveTo(new Vector(50, 50), 125);
+    }
+
+    updateLives(lives) {
+        this.#lives = lives;
+        this.#hearts.heartImage.sourceView.width = 64 * this.#lives;
+        this.#hearts.heartImage.width = 64 * this.#lives;
     }
 
 }

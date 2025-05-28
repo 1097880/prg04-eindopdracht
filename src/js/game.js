@@ -69,7 +69,7 @@ export class Game extends Engine {
             this.add(element);
         }
 
-        this.ui = new UI();
+        this.ui = new UI(player);
         this.add(this.ui);
 
         Resources.MenuMusic.loop = true;

@@ -16,9 +16,9 @@ export class Spike extends Actor {
             x: x + 32 * width,
             y: y - 29 + yOffset,
             scale: new Vector(2, 2),
-            width: 32 * width - 16,
+            width: 32 * width - 20,
             height: 16 * halfSpike,
-            collisionType: CollisionType.Fixed
+            collisionType: CollisionType.Passive
         });
         this.sprite = new Sprite({
             image: Resources.Spike,

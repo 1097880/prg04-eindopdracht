@@ -5,6 +5,7 @@ import { FloorSlide } from "./particles/floorslide";
 import { JumpPad } from "./jumppad";
 import { PadTrail } from "./particles/padtrail";
 import { GravityPad } from "./gravitypad";
+import { Spike } from "./spike";
 
 export class Player extends Actor {
 
@@ -16,7 +17,7 @@ export class Player extends Actor {
     #isResetting = false;
     #isFlipping = false;
 
-    #lives = 3;
+    lives = 3;
 
     constructor() {
         super({
@@ -38,7 +39,11 @@ export class Player extends Actor {
         this.addChild(this.jumppadtrail);
 
         this.on('collisionstart', (e) => this.collisionHandler(e));
-        this.on('collisionend', (e) => { this.#isGrounded = false })
+        this.on('collisionend', (e) => {
+            if (e.other.owner instanceof Block) {
+                this.#isGrounded = false
+            }
+        })
     }
 
     onPreUpdate(engine) {
@@ -84,6 +89,7 @@ export class Player extends Actor {
         this.#isAlive = false;
         this.#isResetting = true;
         this.#isFlipping = false;
+        this.lives = 3;
 
         this.body.useGravity = false;
         this.vel = Vector.Zero;
@@ -104,6 +110,7 @@ export class Player extends Actor {
 
             this.graphics.opacity = 1;
 
+            this.scene.engine.ui.updateLives(this.lives);
             Resources.GameMusic.play();
         }, 1500);
     }
@@ -142,6 +149,17 @@ export class Player extends Actor {
         if (e.other.owner instanceof JumpPad) {
             this.body.vel.y = -1600;
             this.jumppadtrail.isEmitting = true;
+        }
+
+        if (e.other.owner instanceof Spike) {
+            this.#isGrounded = true;
+            this.lives--;
+            this.scene.engine.ui.updateLives(this.lives);
+            Resources.HitSfx.play();
+
+            if (this.lives < 1) {
+                this.restartLevel();
+            }
         }
     }
 
