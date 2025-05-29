@@ -14,6 +14,7 @@ const Resources = {
     SawBlade: new ImageSource('images/sawblade.png'),
     JumpPad: new ImageSource('images/jumppad.png'),
     GravityPad: new ImageSource('images/gravitypad.png'),
+    JumpOrb: new ImageSource('images/jumporb.png'),
 
     Logo: new ImageSource('images/logo.png'),
     Heart: new ImageSource('images/heart.png', { wrapping: ImageWrapping.Repeat })

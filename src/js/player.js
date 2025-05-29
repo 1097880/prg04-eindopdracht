@@ -7,6 +7,8 @@ import { PadTrail } from "./particles/padtrail";
 import { GravityPad } from "./gravitypad";
 import { Spike } from "./spike";
 import { Obstacle } from "./obstacle";
+import { JumpOrb } from "./jumporb";
+import { SawBlade } from "./sawblade";
 
 export class Player extends Actor {
 
@@ -17,6 +19,9 @@ export class Player extends Actor {
     #isAlive = false;
     #isResetting = false;
     #isFlipping = false;
+
+    #isTouchingJumpOrb = false;
+    #jumpBuffer = 0;
 
     lives = 3;
 
@@ -46,25 +51,59 @@ export class Player extends Actor {
             if (e.other.owner instanceof Block) {
                 this.#isGrounded = false
             }
+            if (e.other.owner instanceof JumpOrb) {
+                this.#isTouchingJumpOrb = false;
+            }
         })
     }
 
     onPreUpdate(engine) {
+        // Camera Logic
         if (this.body.vel.x > 0) {
             this.updateCameraPos();
         }
 
+        // Keep Player at the same speed, even if
+        // barely touched a wall.
         if (this.#isAlive && (this.body.vel.x < this.#speed || this.body.vel.x > this.#speed)) {
             this.body.vel = new Vector(this.#speed, this.body.vel.y);
         }
 
+        // Restart the level if player falls out of
+        // the world.
+        if (this.#isAlive && (this.body.pos.y > 2000 || this.body.pos.y < -1000)) {
+            this.restartLevel();
+        }
+
+        // Jump Logic
         if (engine.input.keyboard.isHeld(Keys.Space) && this.#isGrounded && this.#isAlive && !this.#isResetting) {
             this.jump();
         }
+
+        // Jump Orb Logic
+        if (engine.input.keyboard.wasPressed(Keys.Space) && this.isActive && !this.#isResetting) {
+            this.#jumpBuffer = 0.15;
+            if(this.#isTouchingJumpOrb) {
+                const flip = (this.scene.engine.physics.gravity.y > 0) ? 1 : -1;
+                this.body.vel.y = -this.#jumpStrength * flip;
+                this.jumppadtrail.isEmitting = true;
+            }
+        }
+        if (this.#isTouchingJumpOrb && this.#jumpBuffer > 0) {
+            this.body.vel.y = -this.#jumpStrength;
+            this.jumppadtrail.isEmitting = true;
+            this.#jumpBuffer = 0;
+        }
+        if (this.#jumpBuffer > 0) {
+            this.#jumpBuffer -= engine.clock.elapsed() / 1000;
+        }
+
+        // Start Game Logic
         if (engine.input.keyboard.wasPressed(Keys.Space) && !this.#isAlive && !this.#isResetting) {
             this.startGame();
         }
 
+        // FloorSlide particle
         this.floorslide.isEmitting = this.#isGrounded && this.#isAlive;
     }
 
@@ -113,6 +152,11 @@ export class Player extends Actor {
 
             this.graphics.opacity = 1;
 
+            const sawblades = this.scene.engine.currentScene.actors.filter(child => child instanceof SawBlade);
+            sawblades.forEach(blade => {
+                blade.onLevelRestart();
+            });
+
             this.scene.engine.ui.updateLives(this.lives);
             Resources.GameMusic.play();
         }, 1500);
@@ -155,6 +199,10 @@ export class Player extends Actor {
         if (e.other.owner instanceof JumpPad) {
             this.body.vel.y = -1600;
             this.jumppadtrail.isEmitting = true;
+        }
+
+        if (e.other.owner instanceof JumpOrb) {
+            this.#isTouchingJumpOrb = true;
         }
 
         if (e.other.owner instanceof Obstacle) {

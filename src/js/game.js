@@ -8,6 +8,7 @@ import { Spike } from './spike.js';
 import { JumpPad } from './jumppad.js';
 import { GravityPad } from './gravitypad.js';
 import { SawBlade } from './sawblade.js';
+import { JumpOrb } from './jumporb.js';
 
 export class Game extends Engine {
 
@@ -65,11 +66,28 @@ export class Game extends Engine {
             [GravityPad, 64 * 164, 272, true],
             [GravityPad, 64 * 171, 592, false],
             [SawBlade, 64 * 170, 400, new Vector(-64 * 2, 0), 100],
-            [Block, 64* 173, 272, 20, 2]
+            [Block, 64 * 173, 272, 21, 2],
+            [Spike, 64 * 176, 336, 3, false, true],
+            [Block, 64 * 183, 400, 1, 2],
+            [Block, 64 * 187, 464, 1, 4],
+            [Block, 64 * 189, 400, 1, 3],
+            [Block, 64 * 192, 528, 1, 4],
+            [GravityPad, 64 * 192, 528, true],
+            [Block, 64 * 191, 848, 20, 2],
+            [SawBlade, 64* 196, 720],
+            [SawBlade, 64 * 201, 592, new Vector(0, 128), 150],
+            [SawBlade, 64 * 206, 592, new Vector(0, 192), 150],
+            [Block, 64 * 219, 848, 5, 2],
+            [JumpOrb, 64* 215, 720],
+            [JumpOrb, 64 * 228, 720],
+            [JumpOrb, 64 * 232, 656],
+            [JumpOrb, 64 * 236, 592],
+            [Block, 64 * 240, 720, 1, 1],
+            [JumpPad, 64 * 240, 656]
         ]
 
-        for (const [object, x, y, par1, par2] of LevelLayout) {
-            const element = new object(x, y, par1, par2);
+        for (const [object, x, y, par1, par2, par3] of LevelLayout) {
+            const element = new object(x, y, par1, par2, par3);
             this.add(element);
         }
 

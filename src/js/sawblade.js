@@ -6,6 +6,7 @@ export class SawBlade extends Obstacle {
     #offset;
     #speed;
     #moving = false;
+    #originalPos;
 
     /**
     * Creates a new saw blade at the specified coördinates with the optionally specified movement path.
@@ -34,6 +35,7 @@ export class SawBlade extends Obstacle {
         });
         this.#offset = offset;
         this.#speed = speed;
+        this.#originalPos = this.pos;
 
     }
 
@@ -49,12 +51,18 @@ export class SawBlade extends Obstacle {
                         repeatCtx.moveBy(this.#offset.x, this.#offset.y, this.#speed);
                         repeatCtx.moveBy(-this.#offset.x, -this.#offset.y, this.#speed);
                     });
-                this.#moving = true;
             }
+            this.#moving = true;
         }
 
-        if(this.#moving) {
+        if (this.#moving) {
             this.rotation -= 0.1;
         }
+    }
+
+    onLevelRestart() {
+        this.#moving = false;
+        this.actions.clearActions();
+        this.pos = this.#originalPos
     }
 }

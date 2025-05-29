@@ -9,17 +9,20 @@ export class Spike extends Obstacle {
     * @param {number} y - Y position of the spike, starting from the bottom.
     * @param {number} width - How many tiles the spike should have in the X direction. 20 blocks is 1280px wide (Whole screen width).
     * @param {boolean} half - Should a lower spike be used? Defaults to false.
+    * @param {boolean} flip - Should the graphic be flipped upside down? Usefull for reversed gravity. Defaults to false.
     */
-    constructor(x, y, width = 1, half = false) {
+    constructor(x, y, width = 1, half = false, flip = false) {
         const halfSpike = (half) ? 0.6 : 1;
-        const yOffset = (half) ? 9 : 0;
+        let yOffset = (half) ? 9 : 0;
+        const rotation = (flip) ? Math.PI : 0;
         super({
             x: x + 32 * width,
-            y: y - 29 + yOffset,
+            y: y - 32 + yOffset,
             scale: new Vector(2, 2),
             width: 32 * width - 20,
             height: 16 * halfSpike,
-            collisionType: CollisionType.Passive
+            collisionType: CollisionType.Passive,
+            rotation: rotation
         });
         this.sprite = new Sprite({
             image: Resources.Spike,
