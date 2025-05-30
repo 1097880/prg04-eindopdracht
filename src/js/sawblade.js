@@ -6,7 +6,9 @@ export class SawBlade extends Obstacle {
     #offset;
     #speed;
     #moving = false;
-    #originalPos;
+    #originalX;
+    #originalY;
+    #playerDeath = false;
 
     /**
     * Creates a new saw blade at the specified coördinates with the optionally specified movement path.
@@ -35,7 +37,8 @@ export class SawBlade extends Obstacle {
         });
         this.#offset = offset;
         this.#speed = speed;
-        this.#originalPos = this.pos;
+        this.#originalX = this.body.pos.x;
+        this.#originalY = this.body.pos.y;
 
     }
 
@@ -44,7 +47,7 @@ export class SawBlade extends Obstacle {
     }
 
     onPreUpdate(engine) {
-        if (this.scene.engine.player.pos.distance(this.pos) < 1280 && !this.#moving) {
+        if (this.scene.engine.player.pos.distance(this.pos) < 1280 && !this.#moving && !this.#playerDeath) {
             if (this.#offset.x !== 0 || this.#offset.y !== 0) {
                 this.actions
                     .repeat(repeatCtx => {
@@ -60,9 +63,15 @@ export class SawBlade extends Obstacle {
         }
     }
 
-    onLevelRestart() {
-        this.#moving = false;
+    onPlayerDeath() {
+        this.#playerDeath = true;
         this.actions.clearActions();
-        this.pos = this.#originalPos
+        this.#moving = false;
+    }
+
+    onLevelRestart() {
+        this.body.pos.x = this.#originalX;
+        this.body.pos.y = this.#originalY;
+        this.#playerDeath = false;
     }
 }

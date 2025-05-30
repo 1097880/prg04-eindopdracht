@@ -15,6 +15,8 @@ const Resources = {
     JumpPad: new ImageSource('images/jumppad.png'),
     GravityPad: new ImageSource('images/gravitypad.png'),
     JumpOrb: new ImageSource('images/jumporb.png'),
+    FlyPortal: new ImageSource('images/flyportal.png'),
+    Finish: new ImageSource('images/finish.png', { wrapping: ImageWrapping.Repeat }),
 
     Logo: new ImageSource('images/logo.png'),
     Heart: new ImageSource('images/heart.png', { wrapping: ImageWrapping.Repeat })

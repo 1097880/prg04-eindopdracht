@@ -1,24 +1,29 @@
-import { Actor, CollisionType, Color, Keys, Vector } from "excalibur";
+import { Actor, CollisionType, Color, Keys, RadiusAroundActorStrategy, Vector } from "excalibur";
 import { Resources } from "./resources";
 import { Block } from "./block";
 import { FloorSlide } from "./particles/floorslide";
 import { JumpPad } from "./jumppad";
 import { PadTrail } from "./particles/padtrail";
 import { GravityPad } from "./gravitypad";
-import { Spike } from "./spike";
 import { Obstacle } from "./obstacle";
 import { JumpOrb } from "./jumporb";
 import { SawBlade } from "./sawblade";
+import { FlyPortal } from "./flyportal";
+import { Fly } from "./particles/fly";
+import { Finish } from "./finish";
 
 export class Player extends Actor {
 
     #speed = 535;
     #jumpStrength = 1150;
+    #flyStrength = 500;
 
     #isGrounded = false;
     #isAlive = false;
     #isResetting = false;
     #isFlipping = false;
+    #isFlying = false;
+    #levelComplete = false;
 
     #isTouchingJumpOrb = false;
     #jumpBuffer = 0;
@@ -45,6 +50,8 @@ export class Player extends Actor {
         this.addChild(this.jumppadtrail);
         this.gravitypadtrail = new PadTrail(Color.Purple);
         this.addChild(this.gravitypadtrail);
+        this.flyparticle = new Fly();
+        this.addChild(this.flyparticle);
 
         this.on('collisionstart', (e) => this.collisionHandler(e));
         this.on('collisionend', (e) => {
@@ -59,8 +66,11 @@ export class Player extends Actor {
 
     onPreUpdate(engine) {
         // Camera Logic
-        if (this.body.vel.x > 0) {
+        if (this.body.vel.x > 0 && this.body.pos.x < 23750) {
             this.updateCameraPos();
+        }
+        if (this.body.pos.x >= 23750 && this.body.pos.x < 24000) {
+            this.scene?.camera.strategy.radiusAroundActor(this, 1000);
         }
 
         // Keep Player at the same speed, even if
@@ -76,8 +86,13 @@ export class Player extends Actor {
         }
 
         // Jump Logic
-        if (engine.input.keyboard.isHeld(Keys.Space) && this.#isGrounded && this.#isAlive && !this.#isResetting) {
+        if (engine.input.keyboard.isHeld(Keys.Space) && this.#isGrounded && this.#isAlive && !this.#isResetting && !this.#isFlying) {
             this.jump();
+        }
+
+        // Fly Logic
+        if (engine.input.keyboard.isHeld(Keys.Space) && this.#isAlive && !this.#isResetting && this.#isFlying) {
+            this.fly();
         }
 
         // Jump Orb Logic
@@ -90,7 +105,8 @@ export class Player extends Actor {
             }
         }
         if (this.#isTouchingJumpOrb && this.#jumpBuffer > 0) {
-            this.body.vel.y = -this.#jumpStrength;
+            const flip = (this.scene.engine.physics.gravity.y > 0) ? 1 : -1;
+            this.body.vel.y = -this.#jumpStrength * flip;
             this.jumppadtrail.isEmitting = true;
             this.#jumpBuffer = 0;
         }
@@ -99,18 +115,24 @@ export class Player extends Actor {
         }
 
         // Start Game Logic
-        if (engine.input.keyboard.wasPressed(Keys.Space) && !this.#isAlive && !this.#isResetting) {
+        if (engine.input.keyboard.wasPressed(Keys.Space) && !this.#isAlive && !this.#isResetting && !this.#levelComplete) {
             this.startGame();
         }
 
         // FloorSlide particle
-        this.floorslide.isEmitting = this.#isGrounded && this.#isAlive;
+        this.floorslide.isEmitting = this.#isGrounded && this.#isAlive && !this.#isFlying;
     }
 
     jump() {
         const flip = (this.scene.engine.physics.gravity.y > 0) ? 1 : -1;
         this.body.vel = new Vector(this.body.vel.x, -this.#jumpStrength * flip);
         this.#isGrounded = false;
+    }
+
+    fly() {
+        const flip = (this.scene.engine.physics.gravity.y > 0) ? 1 : -1;
+
+        this.body.vel = new Vector(this.body.vel.x, -this.#flyStrength * flip);
     }
 
     updateCameraPos() {
@@ -131,13 +153,21 @@ export class Player extends Actor {
         this.#isAlive = false;
         this.#isResetting = true;
         this.#isFlipping = false;
+        this.#isFlying = false;
         this.lives = 3;
+
+        this.flyparticle.isEmitting = false;
 
         this.body.useGravity = false;
         this.vel = Vector.Zero;
         this.scene.engine.physics.gravity = new Vector(this.scene.engine.physics.gravity.x, 4000);
 
         this.graphics.opacity = 0;
+
+        const sawblades = this.scene.engine.currentScene.actors.filter(child => child instanceof SawBlade);
+        sawblades.forEach(blade => {
+            blade.onPlayerDeath();
+        });
 
         Resources.GameMusic.stop();
         Resources.DeathSfx.play();
@@ -152,7 +182,6 @@ export class Player extends Actor {
 
             this.graphics.opacity = 1;
 
-            const sawblades = this.scene.engine.currentScene.actors.filter(child => child instanceof SawBlade);
             sawblades.forEach(blade => {
                 blade.onLevelRestart();
             });
@@ -160,6 +189,16 @@ export class Player extends Actor {
             this.scene.engine.ui.updateLives(this.lives);
             Resources.GameMusic.play();
         }, 1500);
+    }
+
+    levelCompleted() {
+        this.#isAlive = false;
+        this.#isFlying = false;
+        this.#levelComplete = true;
+
+        this.flyparticle.isEmitting = false;
+        
+        this.graphics.opacity = 0;
     }
 
     collisionHandler(e) {
@@ -197,7 +236,8 @@ export class Player extends Actor {
         }
 
         if (e.other.owner instanceof JumpPad) {
-            this.body.vel.y = -1600;
+            const flip = (this.scene.engine.physics.gravity.y > 0) ? 1 : -1;
+            this.body.vel.y = -1600 * flip;
             this.jumppadtrail.isEmitting = true;
         }
 
@@ -214,6 +254,15 @@ export class Player extends Actor {
             if (this.lives < 1) {
                 this.restartLevel();
             }
+        }
+
+        if(e.other.owner instanceof FlyPortal) {
+            this.#isFlying = !this.#isFlying;
+            this.flyparticle.isEmitting = this.#isFlying;
+        }
+
+        if(e.other.owner instanceof Finish) {
+            this.levelCompleted();
         }
     }
 

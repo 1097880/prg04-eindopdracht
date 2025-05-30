@@ -13,8 +13,8 @@ export class JumpOrb extends Actor {
             x: x + 32,
             y: y,
             scale: new Vector(2, 2),
-            width: 24,
-            height: 24,
+            width: 20,
+            height: 20,
             collisionType: CollisionType.Passive
         });
     }

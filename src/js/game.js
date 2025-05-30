@@ -1,5 +1,5 @@
 import '../css/style.css';
-import { Actor, BoundingBox, DisplayMode, Engine, SolverStrategy, Vector } from "excalibur";
+import { DisplayMode, Engine, SolverStrategy, Vector } from "excalibur";
 import { Resources, ResourceLoader } from './resources.js';
 import { Player } from './player.js';
 import { Block } from './block.js';
@@ -9,6 +9,9 @@ import { JumpPad } from './jumppad.js';
 import { GravityPad } from './gravitypad.js';
 import { SawBlade } from './sawblade.js';
 import { JumpOrb } from './jumporb.js';
+import { FlyPortal } from './flyportal.js';
+import { Finish } from './finish.js';
+
 
 export class Game extends Engine {
 
@@ -74,16 +77,44 @@ export class Game extends Engine {
             [Block, 64 * 192, 528, 1, 4],
             [GravityPad, 64 * 192, 528, true],
             [Block, 64 * 191, 848, 20, 2],
-            [SawBlade, 64* 196, 720],
+            [SawBlade, 64 * 196, 720],
             [SawBlade, 64 * 201, 592, new Vector(0, 128), 150],
             [SawBlade, 64 * 206, 592, new Vector(0, 192), 150],
-            [Block, 64 * 219, 848, 5, 2],
-            [JumpOrb, 64* 215, 720],
-            [JumpOrb, 64 * 228, 720],
-            [JumpOrb, 64 * 232, 656],
-            [JumpOrb, 64 * 236, 592],
+            [Block, 64 * 219, 848, 4, 2],
+            [JumpOrb, 64 * 215, 720],
+            [JumpOrb, 64 * 227, 720],
+            [JumpOrb, 64 * 231.5, 656],
+            [JumpOrb, 64 * 235.5, 592],
             [Block, 64 * 240, 720, 1, 1],
-            [JumpPad, 64 * 240, 656]
+            [GravityPad, 64 * 240, 656],
+            [Block, 64 * 243, 144, 23, 2],
+            [Spike, 64 * 253, 208, 6, false, true],
+            [JumpOrb, 64 * 255, 272],
+            [Spike, 64 * 262, 208, 3, false, true],
+            [GravityPad, 64 * 265, 144, true],
+            [Block, 64 * 265, 720, 120, 2],
+            [Block, 64 * 265, 80, 120, 1],
+            [FlyPortal, 64 * 270, 592],
+            [SawBlade, 64 * 290, 400, new Vector(-1000, 0), 500],
+            [SawBlade, 64 * 300, 300, new Vector(-1000, 0), 500],
+            [SawBlade, 64 * 305, 200, new Vector(-1000, 0), 500],
+            [SawBlade, 64 * 306, 550, new Vector(-1000, 0), 500],
+            [SawBlade, 64 * 310, 300, new Vector(-1000, 0), 500],
+            [SawBlade, 64 * 315, 400, new Vector(-1000, 0), 500],
+            [SawBlade, 64 * 320, 550, new Vector(-1000, 0), 500],
+            [SawBlade, 64 * 330, 200, new Vector(0, 200), 500],
+            [SawBlade, 64 * 340, 550, new Vector(0, -200), 500],
+            [SawBlade, 64 * 350, 350, new Vector(0, 200), 500],
+            [SawBlade, 64 * 360, 350, new Vector(0, -200), 500],
+            [Spike, 64 * 320, 592, 3, false, false],
+            [Spike, 64 * 325, 592, 2, false, false],
+            [Spike, 64 * 330, 592, 7, false, false],
+            [Spike, 64 * 342, 592, 2, false, false],
+            [Block, 64* 365, 350, 2, 2],
+            [Block, 64 * 370, 450, 2, 2],
+            [Block, 64 * 375, 250, 2, 2],
+            [Block, 64 * 380, 550, 2, 2],
+            [Finish, 64 * 385, 720, 3, 11]
         ]
 
         for (const [object, x, y, par1, par2, par3] of LevelLayout) {
