@@ -11,6 +11,7 @@ import { SawBlade } from "./sawblade";
 import { FlyPortal } from "./flyportal";
 import { Fly } from "./particles/fly";
 import { Finish } from "./finish";
+import { Collectable } from "./collectable";
 
 export class Player extends Actor {
 
@@ -29,6 +30,8 @@ export class Player extends Actor {
     #jumpBuffer = 0;
 
     lives = 3;
+    coins = 0;
+    score = 0;
 
     constructor() {
         super({
@@ -64,13 +67,20 @@ export class Player extends Actor {
         })
     }
 
-    onPreUpdate(engine) {
+    onPreUpdate(engine, delta) {
         // Camera Logic
         if (this.body.vel.x > 0 && this.body.pos.x < 23750) {
             this.updateCameraPos();
         }
         if (this.body.pos.x >= 23750 && this.body.pos.x < 24000) {
             this.scene?.camera.strategy.radiusAroundActor(this, 1000);
+        }
+
+        // Update current score
+        if (this.#isAlive) {
+            this.score += delta / 10;
+            this.score = Math.round(this.score);
+            this.scene.engine.ui.updateScore(this.score);
         }
 
         // Keep Player at the same speed, even if
@@ -98,7 +108,7 @@ export class Player extends Actor {
         // Jump Orb Logic
         if (engine.input.keyboard.wasPressed(Keys.Space) && this.isActive && !this.#isResetting) {
             this.#jumpBuffer = 0.15;
-            if(this.#isTouchingJumpOrb) {
+            if (this.#isTouchingJumpOrb) {
                 const flip = (this.scene.engine.physics.gravity.y > 0) ? 1 : -1;
                 this.body.vel.y = -this.#jumpStrength * flip;
                 this.jumppadtrail.isEmitting = true;
@@ -155,6 +165,7 @@ export class Player extends Actor {
         this.#isFlipping = false;
         this.#isFlying = false;
         this.lives = 3;
+        this.coins = 0;
 
         this.flyparticle.isEmitting = false;
 
@@ -164,9 +175,15 @@ export class Player extends Actor {
 
         this.graphics.opacity = 0;
 
+        this.handleHighScore();
+
         const sawblades = this.scene.engine.currentScene.actors.filter(child => child instanceof SawBlade);
+        const collectables = this.scene.engine.currentScene.actors.filter(child => child instanceof Collectable);
         sawblades.forEach(blade => {
             blade.onPlayerDeath();
+        });
+        collectables.forEach(collectable => {
+            collectable.onLevelRestart();
         });
 
         Resources.GameMusic.stop();
@@ -179,6 +196,7 @@ export class Player extends Actor {
             this.#isResetting = false;
 
             this.body.useGravity = true;
+            this.score = 0;
 
             this.graphics.opacity = 1;
 
@@ -187,6 +205,7 @@ export class Player extends Actor {
             });
 
             this.scene.engine.ui.updateLives(this.lives);
+            this.scene.engine.ui.updateCoins(this.coins);
             Resources.GameMusic.play();
         }, 1500);
     }
@@ -197,8 +216,25 @@ export class Player extends Actor {
         this.#levelComplete = true;
 
         this.flyparticle.isEmitting = false;
-        
+
         this.graphics.opacity = 0;
+
+        Resources.GameMusic.stop();
+        Resources.VictorySfx.play();
+
+        this.score = 5500;
+        this.score += this.coins * 1500;
+        this.scene.engine.ui.updateScore(this.score);
+
+        this.handleHighScore();
+
+        this.scene?.engine.ui.finishGame();
+    }
+
+    handleHighScore() {
+        if (this.score > (localStorage.getItem('highscore') || 0)) {
+            this.scene.engine.ui.updateHighScore(this.score);
+        }
     }
 
     collisionHandler(e) {
@@ -256,12 +292,12 @@ export class Player extends Actor {
             }
         }
 
-        if(e.other.owner instanceof FlyPortal) {
+        if (e.other.owner instanceof FlyPortal) {
             this.#isFlying = !this.#isFlying;
             this.flyparticle.isEmitting = this.#isFlying;
         }
 
-        if(e.other.owner instanceof Finish) {
+        if (e.other.owner instanceof Finish) {
             this.levelCompleted();
         }
     }

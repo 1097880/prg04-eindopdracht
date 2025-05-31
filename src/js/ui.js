@@ -6,17 +6,23 @@ export class UI extends ScreenElement {
     #player;
     #logo;
     #hearts;
+    #coinCounter;
 
     #startMessage;
     #zoomTime = 0;
     #fading = false;
+    #highScore;
 
     #lives;
+    #coins;
 
     constructor(player) {
         super();
         this.#player = player;
         this.#lives = player.lives;
+        this.#coins = player.coins;
+
+        this.#highScore = localStorage.getItem('highscore') || 0;
     }
 
     onInitialize(engine) {
@@ -38,6 +44,28 @@ export class UI extends ScreenElement {
         });
         this.addChild(this.#startMessage);
 
+        this.highScoreLabel = new Label({
+            text: `Highscore: ${this.#highScore}`,
+            pos: new Vector(640, 50),
+            font: Resources.PixelFont.toFont({
+                size: 15,
+                color: Color.White,
+                textAlign: TextAlign.Center
+            })
+        });
+        this.addChild(this.highScoreLabel);
+        
+        this.scoreLabel = new Label({
+            text: '',
+            pos: new Vector(640, 75),
+            font: Resources.PixelFont.toFont({
+                size: 15,
+                color: Color.White,
+                textAlign: TextAlign.Center
+            })
+        });
+        this.addChild(this.scoreLabel);
+
         this.#hearts = new Actor({
             x: 50,
             y: -75,
@@ -54,6 +82,23 @@ export class UI extends ScreenElement {
         });
         this.#hearts.graphics.use(this.#hearts.heartImage);
         this.addChild(this.#hearts);
+
+        this.#coinCounter = new Actor({
+            x: 1198,
+            y: -75,
+            anchor: Vector.Zero
+        })
+        this.#coinCounter.coinImage = new Sprite({
+            image: Resources.Coin,
+            sourceView: {
+                x: 0,
+                y: 0,
+                width: -64 * this.#coins,
+                height: 64
+            }
+        });
+        this.#coinCounter.graphics.use(this.#coinCounter.coinImage);
+        this.addChild(this.#coinCounter);
     }
 
     onPreUpdate(engine, delta) {
@@ -79,12 +124,49 @@ export class UI extends ScreenElement {
         this.#logo.actions.moveTo(new Vector(640, -100), 500);
 
         this.#hearts.actions.moveTo(new Vector(50, 50), 125);
+        this.#coinCounter.actions.moveTo(new Vector(1198, 50), 125);
+
+        this.updateCoins(this.#coins);
+    }
+
+    finishGame() {
+        this.#hearts.actions.moveTo(new Vector(300, 360), 500);
+        this.#coinCounter.actions.moveTo(new Vector(980, 360), 500);
+
+        this.scoreLabel.actions.moveTo(new Vector(640, 225), 350);
+        this.scoreLabel.scale = new Vector(2, 2);
+
+        const coinScore = new Label({
+            text: `+${this.#player.coins * 1500} score!`,
+            pos: new Vector(890, 340),
+            font: Resources.PixelFont.toFont({
+                size: 15,
+                color: Color.White,
+                textAlign: TextAlign.Center
+            })
+        });
+        this.addChild(coinScore);
     }
 
     updateLives(lives) {
         this.#lives = lives;
         this.#hearts.heartImage.sourceView.width = 64 * this.#lives;
         this.#hearts.heartImage.width = 64 * this.#lives;
+    }
+
+    updateCoins(coins) {
+        this.#coins = coins;
+        this.#coinCounter.coinImage.sourceView.width = -64 * this.#coins;
+        this.#coinCounter.coinImage.width = - 64 * this.#coins;
+    }
+
+    updateScore(score) {
+        this.scoreLabel.text = `Score: ${score}`;
+    }
+
+    updateHighScore(score) {
+        localStorage.setItem('highscore', score);
+        this.highScoreLabel.text = `Highscore: ${score}`;
     }
 
 }

@@ -7,6 +7,7 @@ const Resources = {
     GameMusic: new Sound('audio/game.mp3'),
     DeathSfx: new Sound('audio/death.mp3'),
     HitSfx: new Sound('audio/hit.mp3'),
+    VictorySfx: new Sound('audio/victory.mp3'),
 
     Player: new ImageSource('images/player.png'),
     Block: new ImageSource('images/block.png', { wrapping: ImageWrapping.Repeat }),
@@ -19,7 +20,8 @@ const Resources = {
     Finish: new ImageSource('images/finish.png', { wrapping: ImageWrapping.Repeat }),
 
     Logo: new ImageSource('images/logo.png'),
-    Heart: new ImageSource('images/heart.png', { wrapping: ImageWrapping.Repeat })
+    Heart: new ImageSource('images/heart.png', { wrapping: ImageWrapping.Repeat }),
+    Coin: new ImageSource('images/coin.png', { wrapping: ImageWrapping.Repeat })
 }
 
 const ResourceLoader = new Loader()

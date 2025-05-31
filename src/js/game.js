@@ -11,6 +11,7 @@ import { SawBlade } from './sawblade.js';
 import { JumpOrb } from './jumporb.js';
 import { FlyPortal } from './flyportal.js';
 import { Finish } from './finish.js';
+import { Coin } from './coin.js';
 
 
 export class Game extends Engine {
@@ -114,7 +115,10 @@ export class Game extends Engine {
             [Block, 64 * 370, 450, 2, 2],
             [Block, 64 * 375, 250, 2, 2],
             [Block, 64 * 380, 550, 2, 2],
-            [Finish, 64 * 385, 720, 3, 11]
+            [Finish, 64 * 385, 720, 3, 11],
+            [Coin, 64 * 41.5, 528, Resources.Coin],
+            [Coin, 64 * 121, 144, Resources.Coin],
+            [Coin, 64 * 305, 250, Resources.Coin]
         ]
 
         for (const [object, x, y, par1, par2, par3] of LevelLayout) {
