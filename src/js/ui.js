@@ -136,8 +136,19 @@ export class UI extends ScreenElement {
         this.scoreLabel.actions.moveTo(new Vector(640, 225), 350);
         this.scoreLabel.scale = new Vector(2, 2);
 
+        const remainingLives = new Label({
+            text: `${this.#player.lives} lives remaining!`,
+            pos: new Vector(390, 340),
+            font: Resources.PixelFont.toFont({
+                size: 15,
+                color: Color.White,
+                textAlign: TextAlign.Center
+            })
+        });
+        this.addChild(remainingLives);
+
         const coinBonus = new Label({
-            text: `+${this.#player.coins * 1500} bonus!`,
+            text: `+${this.#player.coins * 1500} bonus score!`,
             pos: new Vector(890, 340),
             font: Resources.PixelFont.toFont({
                 size: 15,
