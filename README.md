@@ -4,7 +4,7 @@
 
 # Rolling Ball - Platform Game
 
-Rolling Ball is a Platformer Game mixed with elements of an Endless Runner! It was created for the final assignment of Programming 4 at Rotterdam University of Applied Sciences. 
+Rolling Ball is a Platformer Game mixed with elements of an Endless Runner! It was created for the final assignment of the course Programming 4 at Rotterdam University of Applied Sciences. 
 
 
 
